@@ -1,3 +1,10 @@
 export const environment = {
-  production: true
+  production: true,
+  seo: {
+    siteName: '',
+    siteUrl: '',
+    author: '',
+    image: '',
+    twitter: ''
+  }
 };

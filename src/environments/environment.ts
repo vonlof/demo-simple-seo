@@ -3,7 +3,14 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  seo: {
+    siteName: 'Vonlof Simple Seo',
+    siteUrl: 'http://localhost:4200',
+    author: 'Vonlof',
+    image: '',
+    twitter: ''
+  }
 };
 
 /*
