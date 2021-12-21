@@ -1,7 +1,5 @@
 export interface ISeoConfig {
-  siteName?: string;
-  siteUrl?: string;
-  author?: string;
+  siteName: string;
+  siteUrl: string;
   image?: string;
-  twitter?: string;
 }

@@ -1,10 +1,9 @@
-export interface ISeoMeta{
+export interface ISeoMetaData {
   title?: string;
   description?: string;
-  author?: string;
   keywords?: string | string[];
+  author?: string;
   type?: 'website' | 'article';
   image?: string;
-  schemaData?: Record<string, unknown>;
   currentUrl?: string;
 }

@@ -5,9 +5,8 @@
 export const environment = {
   production: false,
   seo: {
-    siteName: 'Vonlof Simple Seo',
+    siteName: 'Simple Seo',
     siteUrl: 'http://localhost:4200',
-    author: 'Vonlof',
     image: '',
     twitter: ''
   }
