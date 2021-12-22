@@ -21,79 +21,54 @@ export class SeoService {
     this.setKeywords(data?.keywords);
     this.setAuthor(data?.author);
     this.setType(data?.type);
-    this.setImage(data?.image);
-    this.setSiteName(this.config.siteName);
+
+    if (this.config.siteName) {
+      this.setSiteName(this.config.siteName);
+    }
+  }
+
+  public setMetaTag(attr: 'name' | 'property' | 'itemprop', attrValue: string, content?: string | undefined, selector?: string) {
+    if (content) {
+      this.metaService.updateTag({ [attr]: attrValue, content }, selector);
+    } else {
+      this.metaService.removeTag(`${attr}='${attrValue}'`);
+    }
   }
 
   private setDescription(description?: string): void {
-    if (description) {
-      this.metaService.updateTag({name: 'description', content: description });
-      this.metaService.updateTag({name: 'twitter:description', content: description });
-      this.metaService.updateTag({property: 'og:description', content: description });
-      this.metaService.updateTag({ itemprop: 'description', content: description }, `itemprop='description'`);
-    } else {
-      this.metaService.removeTag(`name='description'`);
-      this.metaService.removeTag(`name='twitter:description'`);
-      this.metaService.removeTag(`property='og:description'`);
-      this.metaService.removeTag(`itemprop='description'`);
-    }
+    this.setMetaTag('name', 'description', description);
+    this.setMetaTag('name', 'twitter:description', description);
+    this.setMetaTag('property', 'og:description', description);
+    this.setMetaTag('itemprop', 'description', description, `itemprop='description'`);
   }
 
   private setType(type?: 'article' | 'website'): void {
-    if (type) {
-      this.metaService.updateTag({property: 'og:type', content: type});
-    } else {
-      this.metaService.removeTag(`property='og:type'`);
-    }
+    this.setMetaTag('property', 'og:type', type);
   }
 
   private setKeywords(keywords?: string | string[]) {
-    const keysAsString = keywords instanceof Array ? keywords?.join(',') : keywords;
-    if (keysAsString && keysAsString?.length) {
-      this.metaService.updateTag({name: 'keywords', content: keysAsString});
-    } else {
-      this.metaService.removeTag(`name='keywords'`);
-    }
+    const wordsAsString = keywords instanceof Array ? keywords?.join(',') : keywords;
+    this.setMetaTag('name', 'keywords', wordsAsString);
   }
 
   private setAuthor(author?: string) {
-    if (author) {
-      this.metaService.updateTag({name: 'author', content: author});
-      this.metaService.updateTag({name: 'article:author', content: author});
-    } else {
-      this.metaService.removeTag(`name='author'`);
-      this.metaService.removeTag(`name='article:author'`);
-    }
+    this.setMetaTag('name', 'author', author);
+    this.setMetaTag('name', 'article:author', author);
   }
 
   private setSiteName(siteName?: string) {
-    if (siteName) {
-      this.metaService.updateTag({name: 'og:site_name', content: siteName});
-    } else {
-      this.metaService.removeTag(`name='og:site_name'`);
-    }
-  }
-
-  private setImage(image?: string) {
-  // TODO
+    this.setMetaTag('name', 'og:site_name', siteName);
   }
 
   private setTitle(title?: string): void {
     if (title) {
       this.titleService.setTitle(title);
-      this.metaService.updateTag({name: 'title', content: title});
-      this.metaService.updateTag({name: 'twitter:title', content: title});
-      this.metaService.updateTag({name: 'twitter:image:alt', content: title});
-      this.metaService.updateTag({property: 'og:image:alt', content: title});
-      this.metaService.updateTag({property: 'og:title', content: title});
-      this.metaService.updateTag({itemprop: 'name', content: title}, `itemprop='name'`);
-    } else {
-      this.metaService.removeTag(`name='title'`);
-      this.metaService.removeTag(`name='twitter:title'`);
-      this.metaService.removeTag(`name='twitter:image:alt'`);
-      this.metaService.removeTag(`property='og:image:alt'`);
-      this.metaService.removeTag(`property='og:title'`);
-      this.metaService.removeTag(`itemprop='name'`);
     }
+    this.setMetaTag('name', 'title', title);
+    this.setMetaTag('name', 'twitter:title', title);
+    this.setMetaTag('name', 'twitter:image:alt', title);
+    this.setMetaTag('property', 'og:title', title);
+    this.setMetaTag('property', 'og:image:alt', title);
+    this.setMetaTag('itemprop', 'name', title, `itemprop='name'`);
   }
 }
