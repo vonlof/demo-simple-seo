@@ -4,6 +4,4 @@ export interface ISeoMetaData {
   keywords?: string | string[];
   author?: string;
   type?: 'website' | 'article';
-  image?: string;
-  currentUrl?: string;
 }

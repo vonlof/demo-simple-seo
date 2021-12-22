@@ -1,12 +1,15 @@
 # Creating a simple Angular SEO service
-
-### How to build a simple SEO service for an angular frontend application, without a library ;)
+### How to build a simple SEO service for an angular frontend application.
 
 ![title](angular-seo.png)
 
-In this article we are going to create a simple SEO service. This service will inject default Meta and Open Graph tags into the head of our application. This will enable social sharing in a serverside or pre-rendered Angular application.
+In this article we are going to create a simple SEO service. 
+This service will inject default Meta and Open Graph tags into the head of our application. 
+This will enable social sharing in a serverside or pre-rendered Angular application.
 
-Important: In general you should only use this module when you're using Angular Universal or Scully. Generating Meta tags on the frontend is basically useless as not all Crawlers can render Javascript applications.
+*Important: In general you should only use this module when you're using Angular Universal or any other serverside renderer. Generating Meta tags on the frontend is basically useless as not all Crawlers can render Javascript (SPA) applications.*
+
+After reading this post, you could use this code as base for your own seo module.
 
 Before we dive into this we need to know what SEO is. SEO stands for search engine optimization. 
 It is a process of taking steps to help a website or piece of content rank higher on Google.
@@ -16,7 +19,7 @@ To make it a bit simpler, search engine optimization means taking a piece of onl
 
 ## Okay, that is defined, let's get started.
 
-First (If you don't have a project yet) we will generate a new Angular project, us the following command to add one:
+First (If you don't have a project yet) we will generate a new Angular project, use the following command to add one:
 
 ```bash
 ng new demo-simple-seo
@@ -44,19 +47,21 @@ demo-simple-seo
 ...
 
 ```
-Within this module we are going to create an injection for a module configuration. It allows us to configure the services/components on module level. This is useful for mono repo's or custom packages.
+Within this module we are going to use a Generic InjectionToken, so that we can share the configuration from the root module.
+But what is a Generic InjectionToken? Angular provides a generic class InjectionToken<T> to help create custom tokens, 
+these are backed by specific types like classes or interfaces. These types enable static type checks and prevents many type-related errors at early stages.
 
-Start by creating a file named ```interfaces/seo-config.interface.ts```
-Add the following interface:
+Before we set up the injection token, let's create an interface named ```src/app/seo/interfaces/seo-config.interface.ts``` with the following config interface:
 
 ```typescript
 export interface ISeoConfig {
-  siteName: string;
-  siteUrl: string;
-  image?: string;
+  siteName?: string;
+  siteUrl?: string;
 }
 ```
-Then we create a ```inject.ts``` file.
+
+We have to prevent a circular dependency, so we will create a separate file to hold our injection token.
+Create the file in the root of the module and name it ```src/app/seo/inject.ts```
 
 ```typescript
 import { InjectionToken } from '@angular/core';
@@ -64,8 +69,12 @@ import { ISeoConfig } from './interfaces/seo-config.interface';
 
 export const SEO_CONFIG = new InjectionToken<ISeoConfig>('SEO_CONFIG');
 ```
+Create a new service and name it seo
 
-Update the ```seo.module.ts``` wit the following:
+```bash
+ng g service seo/services/seo/seo
+```
+Update the ```src/app/seo/seo.module.ts``` with the following:
 
 ```typescript
 import { ModuleWithProviders, NgModule } from '@angular/core';
@@ -85,14 +94,20 @@ export class SeoModule {
   }
 }
 ```
-As you can see I added a static forRoot() function. This will enable the configuration for our module.
-Next we will create the actual service, go ahead and add a service to the module folder.
+From this moment we can use the token to import the registered value in the service like in the example below:
 
-```bash
-ng g service seo/services/seo/seo
+```typescript
+@Injectable({
+  providedIn: 'root',
+})
+export class SeoService {
+  constructor(
+    @Inject(SEO_CONFIG) private config: ISeoConfig) {
+  }
+}
 ```
 
-First add the following to the constructor
+Angular provides two useful services, we can inject the Title and Meta service in to our own service.
 
 ```typescript
 constructor(
@@ -101,8 +116,15 @@ constructor(
   private metaService: Meta) {
 }
 ```
+From this point we are creating an update function, this will be the entry of the service.
+Go ahead and create the next method.
 
-This will load the injected config and the needed services.
+```typescript
+  update(data: ISeoMetaData): void {
+    
+  }
+
+```
 
 
 ```typescript
@@ -123,7 +145,7 @@ export class SeoService {
     private metaService: Meta) {
   }
 
-  public update(data: ISeoMetaData): void {
+  update(data: ISeoMetaData): void {
     this.setTitle(data?.title)
     this.setDescription(data?.description)
     this.setKeywords(data?.keywords);
@@ -135,7 +157,7 @@ export class SeoService {
     }
   }
 
-  public setMetaTag(attr: 'name' | 'property' | 'itemprop', attrValue: string, content?: string | undefined, selector?: string) {
+  setMetaTag(attr: 'name' | 'property' | 'itemprop', attrValue: string, content?: string | undefined, selector?: string) {
     if (content) {
       this.metaService.updateTag({ [attr]: attrValue, content }, selector);
     } else {
@@ -184,6 +206,9 @@ export class SeoService {
 
 
 ### Conclusion
+Thank you for reading this post, this was my first article on medium and my blog post. So I hope you liked it.
+
+
 So the subject was to create a simple seo service for your application.
 We did that, but for now you have a starter to extend this module.
  
